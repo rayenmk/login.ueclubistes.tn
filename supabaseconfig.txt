@@ -1,0 +1,10 @@
+// Supabase configuration.
+// Use the browser-safe publishable/anon key only. NEVER put the service-role key here.
+window.UE_CONFIG = {
+  SUPABASE_URL: "https://astsvxyqyyzqvuioqsnq.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_TjrlYLmMk5Dp1NmYKCHo6w_VQzGTiTB"
+};
+window.sb = supabase.createClient(
+  window.UE_CONFIG.SUPABASE_URL,
+  window.UE_CONFIG.SUPABASE_ANON_KEY
+);

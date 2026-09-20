@@ -1,0 +1,18 @@
+# Supabase Edge Function configuration
+[functions.admin-create-user]
+verify_jwt = false
+
+[functions.admin-create-admin]
+verify_jwt = false
+
+[functions.admin-update-admin]
+verify_jwt = false
+
+[functions.admin-delete-admin]
+verify_jwt = false
+
+[functions.admin-delete-user]
+verify_jwt = false
+
+[functions.admin-reset-password]
+verify_jwt = false

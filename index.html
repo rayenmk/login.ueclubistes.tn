@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UE Clubiste — Connexion</title>
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-brand">
+      <div class="brand-mark"><img src="assets/logo.png" alt="UE Clubiste"></div>
+      <span class="eyebrow">UNION DES ÉTUDIANTS CLUBISTES</span>
+      <h1>Bienvenue dans<br><strong>l’espace Clubiste</strong></h1>
+      <p>Une plateforme privée pour gérer votre abonnement et vos informations.</p>
+      <div class="brand-line"></div>
+    </section>
+
+    <section class="auth-card">
+      <div class="mobile-logo"><img src="assets/logo.png" alt="UE Clubiste"></div>
+      <div class="card-head">
+        <span class="mini-label">ACCÈS MEMBRE</span>
+        <h2>Se connecter</h2>
+        <p>Accédez à votre espace personnel</p>
+      </div>
+      <form id="loginForm" class="form-stack">
+        <label>Login
+          <input id="login" type="text" autocomplete="username" placeholder="Email ou login abonné" required>
+        </label>
+        <label>Password
+          <input id="password" type="password" autocomplete="current-password" placeholder="Votre mot de passe" required>
+        </label>
+        <div id="loginError" class="alert error hidden"></div>
+        <button class="btn primary full" type="submit">Se connecter <span>→</span></button>
+      </form>
+      <div class="auth-footer">Accès réservé aux comptes autorisés</div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

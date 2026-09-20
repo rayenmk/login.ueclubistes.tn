@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UE Clubiste — Matchs</title>
+<link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="subscriber">
+<div class="app">
+<aside class="sidebar">
+  <div class="side-brand"><img src="assets/logo.png"><div><b>UE Clubiste</b><small>Espace Abonné</small></div></div>
+  <nav>
+    <a href="subscriber.html">⌂ <span>Mon profil</span></a>
+    <a class="active" href="matchs.html">⚽ <span>Matchs</span></a>
+    <a href="subscriber.html#security">⌁ <span>Sécurité</span></a>
+  </nav>
+  <button id="logoutBtn" class="side-logout">↪ Déconnexion</button>
+</aside>
+<div class="main">
+<header class="topbar"><button class="menu-btn" id="menuBtn">☰</button><div><span class="top-kicker">ESPACE ABONNÉ</span><h1>Matchs</h1></div><div class="top-user"><div class="avatar" id="avatar">U</div><span id="userName">Utilisateur</span></div></header>
+<main class="content">
+  <div id="pageAlert"></div>
+  <section class="hero-card match-hero"><div><span class="mini-label">CALENDRIER</span><h2>Les matchs de l'Union</h2><p>Choisissez votre place pour chaque rencontre. Aucun paiement n'est demandé.</p></div><span id="genderBadge" class="badge">—</span></section>
+  <section class="panel"><div class="panel-head"><div><span class="mini-label">PROGRAMME</span><h2>Calendrier des matchs</h2></div><select id="sportFilter" class="match-filter"><option value="">Tous les sports</option><option value="FOOTBALL">Football</option><option value="HANDBALL">Handball</option><option value="BASKETBALL">Basketball</option></select></div>
+  <div id="matchesGrid" class="matches-grid"></div></section>
+</main></div></div>
+
+<div id="matchModal" class="modal hidden"><div class="modal-box match-modal"><div class="modal-head"><div><span class="mini-label">CHOIX DE PLACE</span><h2 id="modalMatchTitle">Match</h2><p id="modalMatchMeta" class="modal-subtitle"></p></div><button class="close" id="closeMatchModal">×</button></div>
+<div id="zones" class="zones-grid"></div>
+<div id="currentChoice" class="current-choice hidden"></div>
+<div class="form-actions match-actions"><button type="button" id="notParticipateBtn" class="btn secondary">Je ne participe pas</button><button type="button" id="confirmZoneBtn" class="btn primary">Confirmer mon choix</button></div>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script src="js/common.js"></script><script src="js/matchs.js"></script>
+</body></html>
