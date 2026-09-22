@@ -3,6 +3,63 @@ let filtered = [];
 let page = 1;
 const pageSize = 10;
 
+let allFaculties = [];
+
+function stripAccents(s) {
+  return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+function splitFacultyName(name) {
+  const i = name.indexOf(" — ");
+  return i === -1 ? { short: name, full: "" } : { short: name.slice(0, i), full: name.slice(i + 3) };
+}
+
+function renderFacultyOptions(query) {
+  const q = stripAccents(query.trim().toLowerCase());
+  const matches = q ? allFaculties.filter(f => stripAccents(f.name).toLowerCase().includes(q)) : allFaculties;
+  const list = $("#fFaculteList");
+
+  list.innerHTML = matches.length
+    ? matches.map(f => {
+        const { short, full } = splitFacultyName(f.name);
+        return `<div class="combo-option" data-id="${f.id}" data-name="${escapeHtml(f.name)}"><b>${escapeHtml(short)}</b>${full ? `<small>${escapeHtml(full)}</small>` : ""}</div>`;
+      }).join("")
+    : '<div class="combo-empty">Aucun résultat</div>';
+}
+
+function selectFaculty(id, name) {
+  $("#fFaculte").value = id || "";
+  $("#fFaculteSearch").value = id ? splitFacultyName(name).short : "";
+  $("#fFaculteList").classList.add("hidden");
+}
+
+function setupFacultyCombo() {
+  const search = $("#fFaculteSearch");
+  const list = $("#fFaculteList");
+
+  search.addEventListener("input", () => {
+    $("#fFaculte").value = "";
+    renderFacultyOptions(search.value);
+    list.classList.remove("hidden");
+  });
+
+  search.addEventListener("focus", () => {
+    renderFacultyOptions(search.value);
+    list.classList.remove("hidden");
+  });
+
+  list.addEventListener("mousedown", e => {
+    const option = e.target.closest(".combo-option");
+    if (!option) return;
+    e.preventDefault();
+    selectFaculty(option.dataset.id, option.dataset.name);
+  });
+
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".combo-field")) list.classList.add("hidden");
+  });
+}
+
 async function loadRefs() {
   const [facultiesResult, zonesResult] = await Promise.all([
     sb.from("faculties").select("id,name").order("name"),
@@ -12,8 +69,7 @@ async function loadRefs() {
   if (facultiesResult.error) return showAlert("#pageAlert", facultiesResult.error.message, "error");
   if (zonesResult.error) return showAlert("#pageAlert", zonesResult.error.message, "error");
 
-  $("#fFaculte").innerHTML = '<option value="">Non définie</option>' +
-    (facultiesResult.data || []).map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`).join("");
+  allFaculties = facultiesResult.data || [];
 
   $("#fZone").innerHTML = '<option value="">Non définie</option>' +
     (zonesResult.data || []).map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`).join("");
@@ -75,15 +131,15 @@ function render() {
       <td>${genderLabel(s.gender)}</td>
       <td>${escapeHtml(s.numero_abonnement)}</td>
       <td>${escapeHtml(s.cin)}</td>
-      <td>${escapeHtml(s.faculties?.name || "—")}</td>
+      <td>${escapeHtml(facultyShort(s.faculties?.name) || "—")}</td>
       <td>${escapeHtml(s.zones?.name || "—")}</td>
       <td>${statusBadge(s.status)}</td>
       <td class="actions">
         <button class="icon-btn" title="Voir la carte membre" onclick="showMemberCard('${s.id}')">▣</button>
-        <button class="icon-btn" title="Modifier" onclick="editSub('${s.id}')">✎</button>
-        <button class="icon-btn" title="Activer/Désactiver" onclick="toggleSub('${s.id}')">${s.status === "ACTIVE" ? "⏸" : "▶"}</button>
-        <button class="icon-btn" title="Réinitialiser mot de passe" onclick="resetPassword('${s.user_id}')">↻</button>
-        <button class="icon-btn danger" title="Supprimer" onclick="deleteSub('${s.id}')">⌫</button>
+        <button class="icon-btn" title="Modifier" onclick="editSub('${s.id}')">${ICONS.edit}</button>
+        <button class="icon-btn" title="Activer/Désactiver" onclick="toggleSub('${s.id}')">${s.status === "ACTIVE" ? ICONS.pause : ICONS.play}</button>
+        <button class="icon-btn" title="Réinitialiser mot de passe" onclick="resetPassword('${s.user_id}')">${ICONS.refresh}</button>
+        <button class="icon-btn danger" title="Supprimer" onclick="deleteSub('${s.id}')">${ICONS.trash}</button>
       </td>
     </tr>
   `).join("") || '<tr><td colspan="10" class="empty">Aucun résultat</td></tr>';
@@ -153,7 +209,7 @@ function openModal(s = null) {
   });
 
   $("#fGender").value = s?.gender || "";
-  $("#fFaculte").value = s?.faculty_id || "";
+  selectFaculty(s?.faculty_id || "", s?.faculties?.name || "");
   $("#fZone").value = s?.zone_id || "";
   $("#fStatus").value = s?.status || "ACTIVE";
 }
@@ -174,7 +230,11 @@ window.toggleSub = async id => {
 };
 
 window.resetPassword = async userId => {
-  const password = prompt("Nouveau mot de passe (12 caractères minimum, avec majuscule, minuscule, chiffre et caractère spécial) :");
+  const password = await promptDialog("Nouveau mot de passe", {
+    input: "password",
+    placeholder: "12 caractères min. : majuscule, minuscule, chiffre, spécial",
+    confirmText: "Réinitialiser"
+  });
   if (!password) return;
   if (password.length < 12) return showAlert("#pageAlert", "Le mot de passe doit contenir au moins 12 caractères.", "error");
   if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) return showAlert("#pageAlert", "Utilisez une majuscule, une minuscule, un chiffre et un caractère spécial.", "error");
@@ -202,7 +262,7 @@ window.resetPassword = async userId => {
 };
 
 window.deleteSub = async id => {
-  if (!confirm("Supprimer cet abonné et son compte ? Cette action est irréversible.")) return;
+  if (!(await confirmDialog("Supprimer cet abonné et son compte ? Cette action est irréversible.", { confirmText: "Supprimer" }))) return;
 
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return showAlert("#pageAlert", "Session administrateur expirée.", "error");
@@ -228,6 +288,7 @@ async function init() {
   if (!ctx) return;
 
   setupShell();
+  setupFacultyCombo();
   await loadRefs();
   await loadSubs();
 

@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UE Clubiste — Abonnés</title>
-<link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="admin">
 <div class="app">
 <aside class="sidebar">
   <div class="side-brand"><img src="assets/logo.png"><div><b>UE Clubiste</b><small>Administration</small></div></div>
   <nav>
-    <a href="dashboard.html">▦ <span>Dashboard</span></a>
-    <a class="active" href="subscribers.html">♙ <span>Abonnés</span></a>
-    <a href="admin-matchs.html">⚽ <span>Matchs</span></a>
-    <a href="faculties.html">▤ <span>Facultés</span></a>
-    <a href="zones.html">⌖ <span>Zones</span></a>
+    <a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.6"/><rect x="13" y="3" width="8" height="8" rx="1.6"/><rect x="3" y="13" width="8" height="8" rx="1.6"/><rect x="13" y="13" width="8" height="8" rx="1.6"/></svg> <span>Dashboard</span></a>
+    <a class="active" href="subscribers.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.3 2.6-5.6 5.5-5.6s5.5 2.3 5.5 5.6"/><circle cx="17" cy="8.5" r="2.4"/><path d="M15.8 14.7c2.5.3 4.3 2.3 4.3 5.3"/></svg> <span>Abonnés</span></a>
+    <a href="admin-matchs.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8.2l3.4 2.5-1.3 4h-4.2l-1.3-4z"/><path d="M12 8.2V4.6M15.4 10.7l3.3-1.4M13.1 14.7l1.9 3.1M8.9 14.7L7 17.8M8.6 10.7L5.3 9.3"/></svg> <span>Matchs</span></a>
+    <a href="faculties.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9L12 4.5 21.5 9 12 13.5 2.5 9z"/><path d="M6.5 11v4.2c0 1.4 2.4 2.8 5.5 2.8s5.5-1.4 5.5-2.8V11"/><path d="M21.5 9v5.5"/></svg> <span>Facultés</span></a>
+    <a href="zones.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 105 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg> <span>Zones</span></a>
   </nav>
-  <button id="logoutBtn" class="side-logout">↪ Déconnexion</button>
+  <button id="logoutBtn" class="side-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4H18a2 2 0 012 2v12a2 2 0 01-2 2h-4.5"/><path d="M3 12h11.5"/><path d="M11 8l4 4-4 4"/></svg> Déconnexion</button>
 </aside>
 <div class="main">
-<header class="topbar"><button class="menu-btn" id="menuBtn">☰</button><div><span class="top-kicker">ADMINISTRATION</span><h1>Abonnés</h1></div><div class="top-user"><div class="avatar">A</div><span>Admin</span></div></header>
+<header class="topbar"><button class="menu-btn" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div><span class="top-kicker">ADMINISTRATION</span><h1>Abonnés</h1></div><div class="top-user"><div class="avatar">A</div><span>Admin</span></div></header>
 <main class="content">
   <div id="pageAlert"></div>
   <section class="panel">
@@ -30,7 +30,7 @@
   </section>
 </main></div></div>
 
-<div id="modal" class="modal hidden"><div class="modal-box"><div class="modal-head"><div><span class="mini-label">ABONNÉ</span><h2 id="modalTitle">Ajouter un abonné</h2></div><button class="close" id="closeModal">×</button></div>
+<div id="modal" class="modal hidden"><div class="modal-box"><div class="modal-head"><div><span class="mini-label">ABONNÉ</span><h2 id="modalTitle">Ajouter un abonné</h2></div><button class="close" id="closeModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <form id="subscriberForm" class="grid-form"><input type="hidden" id="editId">
 <label>Nom<input id="fNom" required></label><label>Prénom<input id="fPrenom" required></label>
 <label>N° abonnement<input id="fNumero" required></label><label>Login<input id="fLogin" value="DHIASOUDA" required></label>
@@ -38,11 +38,12 @@
 <label>Sexe *<select id="fGender" required><option value="">Choisir le sexe</option><option value="MALE">Homme</option><option value="FEMALE">Femme</option></select></label>
 <label>Téléphone<input id="fPhone"></label><label>Email<input id="fEmail" type="email"></label>
 <label>Photo URL<input id="fPhotoUrl" type="url" placeholder="https://.../photo.jpg"></label><label>Adresse<input id="fAdresse"></label>
-<label>Faculté<select id="fFaculte"></select></label><label>Zone<select id="fZone"></select></label>
+<label class="combo-field">Faculté<div class="combo"><input id="fFaculteSearch" type="text" autocomplete="off" placeholder="Tapez ISET, FSEG, ISG, une ville..."><input type="hidden" id="fFaculte"><div id="fFaculteList" class="combo-list hidden"></div></div></label>
+<label>Zone<select id="fZone"></select></label>
 <label>Statut<select id="fStatus"><option value="ACTIVE">Actif</option><option value="INACTIVE">Désactivé</option></select></label>
 <div class="form-actions"><button type="button" class="btn secondary" id="cancelModal">Annuler</button><button class="btn primary">Enregistrer</button></div>
 </form><p class="hint">À la création, le mot de passe initial est le CIN. Il doit être changé à la première connexion. Le sexe est obligatoire pour appliquer les règles de placement des matchs.</p></div></div>
 
 <div id="memberCardModal" class="modal hidden"><div class="modal-box member-card-modal"><div class="modal-head"><div><span class="mini-label">CARTE MEMBRE</span><h2>Carte de l’abonné</h2></div><button class="close" id="closeMemberCardModal">×</button></div><div id="memberCardContent"></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script src="js/common.js"></script><script src="js/subscribers.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="js/config.js"></script><script src="js/common.js"></script><script src="js/subscribers.js"></script>
 </body></html>

@@ -2,22 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>UE Clubiste — Mon espace</title><link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="css/style.css">
+<title>UE Clubiste — Mon espace</title><link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="subscriber">
 <div class="app">
   <aside class="sidebar">
     <div class="side-brand"><img src="assets/logo.png"><div><b>UE Clubiste</b><small>Espace Abonné</small></div></div>
-    <nav>
-      <a class="active" href="subscriber.html">⌂ <span>Mon profil</span></a>
-      <a href="matchs.html">⚽ <span>Matchs</span></a>
-      <a href="https://staduim.ueclubistes.tn" target="_blank" rel="noopener noreferrer">📡 <span>Live du stade</span></a>
-      <a href="#security">⌁ <span>Sécurité</span></a>
-    </nav>
+    <nav><a class="active" href="subscriber.html">⌂ <span>Mon profil</span></a><a href="matchs.html">⚽ <span>Matchs</span></a><a href="#security">⌁ <span>Sécurité</span></a></nav>
     <button id="logoutBtn" class="side-logout">↪ Déconnexion</button>
   </aside>
   <div class="main">
-    <header class="topbar"><button class="menu-btn" id="menuBtn">☰</button><div><span class="top-kicker">ESPACE ABONNÉ</span><h1>Mon espace</h1></div><div class="top-user"><div class="avatar" id="avatar">U</div><span id="userName">Utilisateur</span></div></header>
+    <header class="topbar"><button class="menu-btn" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div><span class="top-kicker">ESPACE ABONNÉ</span><h1>Mon espace</h1></div><div class="top-user"><div class="avatar" id="avatar">U</div><span id="userName">Utilisateur</span></div></header>
     <main class="content">
       <div id="pageAlert"></div>
       <section class="hero-card">
@@ -68,6 +63,6 @@
     </main>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="js/config.js"></script><script src="js/common.js"></script><script src="js/subscriber.js"></script>
 </body></html>

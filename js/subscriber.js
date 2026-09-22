@@ -168,7 +168,7 @@ async function loadUpcomingMatches() {
   $("#avatar").textContent = (s.prenom || s.nom || "U").charAt(0).toUpperCase();
   $("#statusBadge").outerHTML = `<span id="statusBadge" class="badge ${s.status === "ACTIVE" ? "active" : "inactive"}">${s.status === "ACTIVE" ? "Abonnement actif" : "Abonnement désactivé"}</span>`;
   $("#nom").value=s.nom||""; $("#prenom").value=s.prenom||""; $("#numero").value=s.numero_abonnement||"";
-  $("#phone").value=s.phone||""; $("#email").value=s.email||""; $("#faculte").value=s.faculties?.name||"";
+  $("#phone").value=s.phone||""; $("#email").value=s.email||""; $("#faculte").value=facultyShort(s.faculties?.name)||"";
   $("#adresse").value=s.adresse||""; $("#zone").value=s.zones?.name||""; $("#cin").value=s.cin||"";
   if ($("#gender")) $("#gender").value = s.gender === "FEMALE" ? "Femme" : s.gender === "MALE" ? "Homme" : "Non renseigné";
   $("#editBtn").onclick=()=>{ ["phone","email","adresse"].forEach(id=>$( "#"+id).disabled=false); $("#saveRow").classList.remove("hidden"); $("#editBtn").classList.add("hidden"); };

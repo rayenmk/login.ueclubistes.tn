@@ -166,8 +166,8 @@ function renderMatches() {
           <div class="admin-zone-mini">${(m.match_zones || []).map(z => `<span class="${z.is_available ? "on" : "off"}">${escapeHtml(z.zone_name)}</span>`).join("")}</div>
           <div class="admin-card-actions">
             <button class="btn secondary" onclick="showStats('${m.id}')">📊 Statistiques</button>
-            <button class="btn secondary" onclick="editMatch('${m.id}')">✎ Modifier</button>
-            <button class="btn danger-btn" onclick="deleteMatch('${m.id}')">⌫ Supprimer</button>
+            <button class="btn secondary" onclick="editMatch('${m.id}')">${ICONS.edit} Modifier</button>
+            <button class="btn danger-btn" onclick="deleteMatch('${m.id}')">${ICONS.trash} Supprimer</button>
           </div>
         </div>
       </article>
@@ -344,7 +344,7 @@ window.showStats = async matchId => {
 window.deleteMatch = async id => {
   const match = adminMatches.find(m => m.id === id);
   if (!match) return;
-  if (!confirm(`Supprimer le match ${match.home_team} - ${match.away_team} et toutes les participations ?`)) return;
+  if (!(await confirmDialog(`Supprimer le match ${match.home_team} - ${match.away_team} et toutes les participations ?`, { confirmText: "Supprimer" }))) return;
 
   const { error } = await sb.from("matches").delete().eq("id", id);
   if (error) return showAlert("#pageAlert", error.message, "error");

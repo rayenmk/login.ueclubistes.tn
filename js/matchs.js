@@ -206,7 +206,7 @@ async function removeChoice() {
     return;
   }
 
-  if (!confirm("Confirmer que vous ne participez pas à ce match ?")) return;
+  if (!(await confirmDialog("Confirmer que vous ne participez pas à ce match ?", { confirmText: "Oui, retirer" }))) return;
 
   const { error } = await sb.rpc("remove_match_participation", {
     p_match_id: currentMatch.id
