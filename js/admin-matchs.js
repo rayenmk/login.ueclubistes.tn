@@ -84,9 +84,12 @@ async function loadMatches() {
 
   if (error) return showAlert("#pageAlert", error.message, "error");
 
-  adminMatches = (data || [])
-    .filter(isMatchUpcoming)
-    .sort((a, b) => new Date(a.match_date || "2100-01-01") - new Date(b.match_date || "2100-01-01"));
+  const all = data || [];
+  const toTime = m => new Date(`${m.match_date || "2100-01-01"}T${m.match_time || "00:00:00"}`).getTime();
+  const upcoming = all.filter(isMatchUpcoming).sort((a, b) => toTime(a) - toTime(b));
+  const past = all.filter(m => !isMatchUpcoming(m)).sort((a, b) => toTime(b) - toTime(a));
+
+  adminMatches = [...upcoming, ...past];
 
   renderMatches();
 }
@@ -95,7 +98,7 @@ function renderMatches() {
   const container = $("#adminMatchesGrid");
 
   if (!adminMatches.length) {
-    container.innerHTML = '<div class="empty-card">Aucun match à venir.</div>';
+    container.innerHTML = '<div class="empty-card">Aucun match. Ajoutez-en un pour commencer.</div>';
     return;
   }
 
@@ -117,7 +120,10 @@ function renderMatches() {
         <div class="agenda-content">
           <div class="admin-match-header">
             <span class="sport-pill">${escapeHtml(sports[m.sport] || m.sport)}</span>
-            ${m.is_active ? '<span class="badge active">Actif</span>' : '<span class="badge inactive">Fermé</span>'}
+            <span class="admin-match-badges">
+              ${!isMatchUpcoming(m) ? '<span class="badge">Terminé</span>' : ""}
+              ${m.is_active ? '<span class="badge active">Actif</span>' : '<span class="badge inactive">Fermé</span>'}
+            </span>
           </div>
           <div class="agenda-teams">
             <div class="team-side">

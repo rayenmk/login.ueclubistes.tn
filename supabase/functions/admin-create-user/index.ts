@@ -5,9 +5,9 @@ export const allowedOrigins = new Set([
   "http://127.0.0.1:5500",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
-  "https://login.ueclubiste.tn",
-  "https://ueclubiste.tn",
-  "https://www.ueclubiste.tn"
+  "https://login.ueclubistes.tn",
+  "https://ueclubistes.tn",
+  "https://www.ueclubistes.tn"
 ]);
 
 export function corsHeaders(req: Request) {

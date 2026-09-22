@@ -44,8 +44,8 @@ Deploy the contents of `src/` to `login.ueclubistes.tn`. `js/config.js` contains
 The functions already allow:
 
 - `https://login.ueclubistes.tn`
-- `https://ueclubiste.tn`
-- `https://www.ueclubiste.tn`
+- `https://ueclubistes.tn`
+- `https://www.ueclubistes.tn`
 - local development origins
 
 ## 7. Test
