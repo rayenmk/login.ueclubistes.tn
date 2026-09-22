@@ -90,6 +90,7 @@ function apply() {
   const q = $("#search").value.toLowerCase().trim();
   const status = $("#statusFilter").value;
   const gender = $("#genderFilter").value;
+  const card = $("#cardFilter").value;
 
   filtered = allSubs.filter(s => {
     const text = [
@@ -100,7 +101,8 @@ function apply() {
 
     return (!q || text.includes(q)) &&
       (!status || s.status === status) &&
-      (!gender || s.gender === gender);
+      (!gender || s.gender === gender) &&
+      (!card || (card === "paid" ? s.card_paid : !s.card_paid));
   });
 
   page = 1;
@@ -111,6 +113,14 @@ function genderLabel(gender) {
   if (gender === "FEMALE") return '<span class="gender-badge female">Femme</span>';
   if (gender === "MALE") return '<span class="gender-badge male">Homme</span>';
   return '<span class="gender-badge missing">Non défini</span>';
+}
+
+function cardLabel(s) {
+  if (s.card_paid) {
+    const date = s.card_paid_at ? new Date(s.card_paid_at).toLocaleDateString("fr-TN") : "";
+    return `<span class="badge active" title="${escapeHtml(date ? `Payée le ${date}` : "")}">Payée</span>`;
+  }
+  return '<span class="badge inactive">Non payée</span>';
 }
 
 function render() {
@@ -134,6 +144,10 @@ function render() {
       <td>${escapeHtml(facultyShort(s.faculties?.name) || "—")}</td>
       <td>${escapeHtml(s.zones?.name || "—")}</td>
       <td>${statusBadge(s.status)}</td>
+      <td>
+        ${cardLabel(s)}
+        <button class="icon-btn card-toggle-btn" title="${s.card_paid ? "Marquer la carte comme non payée" : "Marquer la carte comme payée"}" onclick="toggleCard('${s.id}')">${s.card_paid ? ICONS.close : ICONS.refresh}</button>
+      </td>
       <td class="actions">
         <button class="icon-btn" title="Voir la carte membre" onclick="showMemberCard('${s.id}')">▣</button>
         <button class="icon-btn" title="Modifier" onclick="editSub('${s.id}')">${ICONS.edit}</button>
@@ -142,7 +156,7 @@ function render() {
         <button class="icon-btn danger" title="Supprimer" onclick="deleteSub('${s.id}')">${ICONS.trash}</button>
       </td>
     </tr>
-  `).join("") || '<tr><td colspan="10" class="empty">Aucun résultat</td></tr>';
+  `).join("") || '<tr><td colspan="11" class="empty">Aucun résultat</td></tr>';
 
   $("#pageInfo").textContent = `Page ${page} / ${totalPages}`;
   $("#prev").disabled = page <= 1;
@@ -229,6 +243,23 @@ window.toggleSub = async id => {
   await loadSubs();
 };
 
+window.toggleCard = async id => {
+  const s = allSubs.find(x => x.id === id);
+  if (!s) return;
+
+  const nextPaid = !s.card_paid;
+  if (nextPaid && !(await confirmDialog(`Confirmer que ${s.prenom} ${s.nom} a payé sa carte membre ?`, { confirmText: "Oui, payée", icon: "question" }))) return;
+
+  const { error } = await sb
+    .from("subscribers")
+    .update({ card_paid: nextPaid, card_paid_at: nextPaid ? new Date().toISOString() : null })
+    .eq("id", id);
+
+  if (error) return showAlert("#pageAlert", error.message, "error");
+  showAlert("#pageAlert", nextPaid ? "Carte marquée comme payée." : "Carte marquée comme non payée.");
+  await loadSubs();
+};
+
 window.resetPassword = async userId => {
   const password = await promptDialog("Nouveau mot de passe", {
     input: "password",
@@ -295,6 +326,7 @@ async function init() {
   $("#search").oninput = apply;
   $("#statusFilter").onchange = apply;
   $("#genderFilter").onchange = apply;
+  $("#cardFilter").onchange = apply;
 
   $("#prev").onclick = () => {
     if (page > 1) { page--; render(); }

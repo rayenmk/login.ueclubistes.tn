@@ -15,34 +15,6 @@ const defaultZones = [
   { key: "VIRAGE_2", name: "Virage 2" }
 ];
 
-function getTeamLogo(teamName, fallbackLabel, customUrl) {
-  if (customUrl && String(customUrl).trim()) return customUrl;
-
-  const team = (teamName || fallbackLabel || "TEAM").trim();
-  const initials = team
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(word => word.charAt(0).toUpperCase())
-    .join("") || "T";
-
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
-      <defs>
-        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="#c8102e"/>
-          <stop offset="100%" stop-color="#3b0b16"/>
-        </linearGradient>
-      </defs>
-      <rect width="120" height="120" rx="28" fill="#0f1012"/>
-      <circle cx="60" cy="60" r="38" fill="url(#g)" opacity="0.95"/>
-      <text x="60" y="69" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#ffffff">${initials}</text>
-    </svg>
-  `;
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
 function formatDate(date) {
   if (!date) return "—";
   return new Date(`${date}T12:00:00`).toLocaleDateString("fr-TN", { day: "2-digit", month: "long", year: "numeric" });
@@ -303,7 +275,7 @@ window.showStats = async matchId => {
   $("#statsModal").classList.remove("hidden");
 
   const { data, error } = await sb.from("match_participations")
-    .select("id,zone_id,subscribers(gender),match_zones(zone_key,zone_name)")
+    .select("id,zone_id,subscribers(nom,prenom,numero_abonnement,gender),match_zones(zone_key,zone_name)")
     .eq("match_id", matchId);
 
   if (error) {
@@ -320,8 +292,9 @@ window.showStats = async matchId => {
   for (const row of rows) {
     const key = row.match_zones?.zone_key || "UNKNOWN";
     const name = row.match_zones?.zone_name || key;
-    if (!zoneCounts[key]) zoneCounts[key] = { name, count: 0 };
+    if (!zoneCounts[key]) zoneCounts[key] = { name, count: 0, members: [] };
     zoneCounts[key].count++;
+    zoneCounts[key].members.push(row.subscribers);
   }
 
   $("#statsContent").innerHTML = `
@@ -332,10 +305,21 @@ window.showStats = async matchId => {
       <article class="stat-card"><span>Non renseigné</span><strong>${unknown}</strong></article>
     </div>
     <div class="panel inner-panel"><div class="panel-head"><div><span class="mini-label">PLACEMENT</span><h2>Participants par zone</h2></div></div>
-      <div class="stats-bars">${defaultZones.map(z => {
-        const item = zoneCounts[z.key] || { name: z.name, count: 0 };
+      <div class="stats-bars">${defaultZones.map((z, i) => {
+        const item = zoneCounts[z.key] || { name: z.name, count: 0, members: [] };
         const percent = total ? Math.round(item.count / total * 100) : 0;
-        return `<div class="bar-row"><div><span>${escapeHtml(item.name)}</span><strong>${item.count}</strong></div><div class="bar-track"><i style="width:${percent}%"></i></div></div>`;
+        const listId = `zoneMembers${i}`;
+        const members = item.members
+          .slice()
+          .sort((a, b) => (a?.nom || "").localeCompare(b?.nom || ""))
+          .map(m => `<li>${escapeHtml(`${m?.prenom || ""} ${m?.nom || ""}`.trim() || "Abonné")} <span class="muted-text">${escapeHtml(m?.numero_abonnement || "")}</span></li>`)
+          .join("");
+        return `<div class="bar-row">
+          <div><span>${escapeHtml(item.name)}</span><strong>${item.count}</strong></div>
+          <div class="bar-track"><i style="width:${percent}%"></i></div>
+          ${item.count ? `<button type="button" class="link-btn zone-toggle" onclick="document.getElementById('${listId}').classList.toggle('hidden')">Voir qui a choisi cette zone</button>
+          <ul id="${listId}" class="zone-members hidden">${members}</ul>` : ""}
+        </div>`;
       }).join("")}</div>
     </div>
   `;

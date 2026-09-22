@@ -93,6 +93,33 @@ function facultyShort(name) {
   const i = name.indexOf(" — ");
   return i === -1 ? name : name.slice(0, i);
 }
+function getTeamLogo(teamName, fallbackLabel, customUrl) {
+  if (customUrl && String(customUrl).trim()) return customUrl;
+
+  const team = (teamName || fallbackLabel || "TEAM").trim();
+  const initials = team
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word.charAt(0).toUpperCase())
+    .join("") || "T";
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#c8102e"/>
+          <stop offset="100%" stop-color="#3b0b16"/>
+        </linearGradient>
+      </defs>
+      <rect width="120" height="120" rx="28" fill="#0f1012"/>
+      <circle cx="60" cy="60" r="38" fill="url(#g)" opacity="0.95"/>
+      <text x="60" y="69" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#ffffff">${initials}</text>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
 function statusBadge(status) {
   return `<span class="badge ${status === "ACTIVE" ? "active" : "inactive"}">${status === "ACTIVE" ? "Actif" : "Désactivé"}</span>`;
 }

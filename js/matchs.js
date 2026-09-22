@@ -57,7 +57,7 @@ async function loadSubscriber() {
 async function loadMatches() {
   const [matchesResult, participationResult] = await Promise.all([
     sb.from("matches")
-      .select("id,sport,home_team,away_team,competition,stadium,match_date,match_time,description,is_active,match_zones(id,zone_key,zone_name,capacity,is_available)")
+      .select("id,sport,home_team,away_team,home_logo_url,away_logo_url,competition,stadium,match_date,match_time,description,is_active,match_zones(id,zone_key,zone_name,capacity,is_available)")
       .eq("is_active", true)
       .order("match_date", { ascending: true })
       .order("match_time", { ascending: true }),
@@ -91,18 +91,41 @@ function renderMatches() {
   container.innerHTML = filteredMatches.map(match => {
     const participation = myParticipation.get(match.id);
     const zone = participation ? (match.match_zones || []).find(z => z.id === participation.zone_id) : null;
+    const homeTeam = match.home_team || "Équipe domicile";
+    const awayTeam = match.away_team || "Équipe visiteuse";
+    const matchDate = match.match_date ? new Date(`${match.match_date}T${match.match_time || "12:00:00"}`) : new Date();
+    const day = matchDate.toLocaleDateString("fr-TN", { day: "2-digit" });
+    const month = matchDate.toLocaleDateString("fr-TN", { month: "short" }).replace(".", "").replace(".", "");
+    const weekday = matchDate.toLocaleDateString("fr-TN", { weekday: "short" }).replace(".", "");
 
     return `
-      <article class="match-card">
-        <div class="match-card-top">
-          <span class="sport-pill">${escapeHtml(sportLabels[match.sport] || match.sport)}</span>
-          ${match.competition ? `<span class="competition">${escapeHtml(match.competition)}</span>` : ""}
+      <article class="match-card agenda-match-card">
+        <div class="agenda-date">
+          <span>${escapeHtml(weekday)}</span>
+          <strong>${escapeHtml(day)}</strong>
+          <small>${escapeHtml(month)}</small>
         </div>
-        <div class="match-teams"><strong>${escapeHtml(match.home_team)}</strong><span>VS</span><strong>${escapeHtml(match.away_team)}</strong></div>
-        <div class="match-info"><span>📅 ${escapeHtml(formatMatchDate(match.match_date, match.match_time))}</span><span>🕐 ${escapeHtml(formatTime(match.match_time))}</span>${match.stadium ? `<span>📍 ${escapeHtml(match.stadium)}</span>` : ""}</div>
-        <div class="match-card-bottom">
-          ${zone ? `<span class="choice-pill">✓ ${escapeHtml(zone.zone_name || zoneLabels[zone.zone_key] || "Place choisie")}</span>` : `<span class="muted-text">Aucune place choisie</span>`}
-          <button class="btn primary" onclick="openMatch('${match.id}')">${zone ? "Modifier" : "Choisir une place"}</button>
+        <div class="agenda-content">
+          <div class="match-card-top">
+            <span class="sport-pill">${escapeHtml(sportLabels[match.sport] || match.sport)}</span>
+            ${match.competition ? `<span class="competition">${escapeHtml(match.competition)}</span>` : ""}
+          </div>
+          <div class="agenda-teams">
+            <div class="team-side">
+              <img src="${getTeamLogo(homeTeam, "HOME", match.home_logo_url)}" alt="Logo ${escapeHtml(homeTeam)}" />
+              <span>${escapeHtml(homeTeam)}</span>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="team-side">
+              <img src="${getTeamLogo(awayTeam, "AWAY", match.away_logo_url)}" alt="Logo ${escapeHtml(awayTeam)}" />
+              <span>${escapeHtml(awayTeam)}</span>
+            </div>
+          </div>
+          <div class="match-info"><span>🕐 ${escapeHtml(formatTime(match.match_time))}</span>${match.stadium ? `<span>📍 ${escapeHtml(match.stadium)}</span>` : ""}</div>
+          <div class="match-card-bottom">
+            ${zone ? `<span class="choice-pill">✓ ${escapeHtml(zone.zone_name || zoneLabels[zone.zone_key] || "Place choisie")}</span>` : `<span class="muted-text">Aucune place choisie</span>`}
+            <button class="btn primary" onclick="openMatch('${match.id}')">${zone ? "Modifier" : "Choisir une place"}</button>
+          </div>
         </div>
       </article>
     `;
@@ -189,7 +212,7 @@ async function saveChoice() {
   });
 
   if (error) {
-    return showAlert("#pageAlert", result.error.message || "Impossible d'enregistrer votre choix.", "error");
+    return showAlert("#pageAlert", error.message || "Impossible d'enregistrer votre choix.", "error");
   }
 
   $("#matchModal").classList.add("hidden");
