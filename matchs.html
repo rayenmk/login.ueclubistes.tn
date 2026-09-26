@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UE Clubiste — Matchs</title>
-<link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css?v=20260926e">
 </head>
 <body data-page="subscriber">
 <div class="app">
@@ -21,8 +21,17 @@
 <main class="content">
   <div id="pageAlert"></div>
   <section class="hero-card match-hero"><div><span class="mini-label">CALENDRIER</span><h2>Les matchs de l'Union</h2><p>Choisissez votre place pour chaque rencontre. Aucun paiement n'est demandé.</p></div><span id="genderBadge" class="badge">—</span></section>
-  <section class="panel"><div class="panel-head"><div><span class="mini-label">PROGRAMME</span><h2>Calendrier des matchs</h2></div><select id="sportFilter" class="match-filter"><option value="">Tous les sports</option><option value="FOOTBALL">Football</option><option value="HANDBALL">Handball</option><option value="BASKETBALL">Basketball</option></select></div>
-  <div id="matchesGrid" class="matches-grid"></div></section>
+  <section class="stats-grid match-page-stats" id="matchPageStats"></section>
+  <section class="panel">
+    <div class="panel-head"><div><span class="mini-label">PROGRAMME</span><h2>Calendrier des matchs</h2></div></div>
+    <div class="sport-pills" id="sportFilter" role="group" aria-label="Filtrer par sport">
+      <button type="button" class="sport-pill-btn active" data-sport="">Tous</button>
+      <button type="button" class="sport-pill-btn" data-sport="FOOTBALL">⚽ Football</button>
+      <button type="button" class="sport-pill-btn" data-sport="HANDBALL">🤾 Handball</button>
+      <button type="button" class="sport-pill-btn" data-sport="BASKETBALL">🏀 Basketball</button>
+    </div>
+    <div id="matchesGrid" class="matches-grid"></div>
+  </section>
 </main></div></div>
 
 <div id="matchModal" class="modal hidden"><div class="modal-box match-modal"><div class="modal-head"><div><span class="mini-label">CHOIX DE PLACE</span><h2 id="modalMatchTitle">Match</h2><p id="modalMatchMeta" class="modal-subtitle"></p></div><button class="close" id="closeMatchModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
@@ -30,5 +39,5 @@
 <div id="currentChoice" class="current-choice hidden"></div>
 <div class="form-actions match-actions"><button type="button" id="notParticipateBtn" class="btn secondary">Je ne participe pas</button><button type="button" id="confirmZoneBtn" class="btn primary">Confirmer mon choix</button></div>
 </div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="js/config.js"></script><script src="js/common.js"></script><script src="js/matchs.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="js/config.js?v=20260926e"></script><script src="js/common.js?v=20260926e"></script><script src="js/matchs.js?v=20260926e"></script>
 </body></html>

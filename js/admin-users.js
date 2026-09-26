@@ -1,12 +1,5 @@
 let admins=[];
-const fn=(name)=>`${UE_CONFIG.SUPABASE_URL}/functions/v1/${name}`;
-async function callFn(name,body){
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session) throw new Error("Session administrateur expirée.");
-  const r=await fetch(fn(name),{method:"POST",headers:{Authorization:`Bearer ${session.access_token}`,apikey:UE_CONFIG.SUPABASE_ANON_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
-  let j={};try{j=await r.json()}catch{}
-  if(!r.ok)throw new Error(j.error||`Erreur ${r.status}`);return j;
-}
+const callFn=callEdgeFunction;
 async function loadAdmins(){
  const {data,error}=await sb.from("profiles").select("id,display_name,email,is_active,created_at").eq("role","ADMIN").order("created_at",{ascending:true});
  if(error)return showAlert("#pageAlert","Impossible de charger les administrateurs.","error");

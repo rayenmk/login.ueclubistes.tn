@@ -62,6 +62,46 @@ function renderMemberCard(subscriber) {
   `;
 }
 
+async function loadMemberStats(s) {
+  const container = $("#memberStats");
+  if (!container) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const [matchesResult, participationResult] = await Promise.all([
+    sb.from("matches").select("match_date,match_time").eq("is_active", true).gte("match_date", today)
+      .order("match_date", { ascending: true }).order("match_time", { ascending: true }).limit(10),
+    sb.from("match_participations").select("id", { count: "exact", head: true }).eq("subscriber_id", s.id)
+  ]);
+
+  const upcoming = (matchesResult.data || []).filter(isMatchUpcoming);
+  const nextMatch = upcoming[0];
+  const nextMatchLabel = nextMatch
+    ? new Date(`${nextMatch.match_date}T${nextMatch.match_time || "12:00:00"}`).toLocaleDateString("fr-TN", { day: "2-digit", month: "short" })
+    : "Aucun";
+  const participationCount = participationResult.count || 0;
+  const cardPaid = s.card_paid === true;
+
+  container.innerHTML = `
+    <article class="stat-card">
+      <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <span>Prochain match</span><strong>${escapeHtml(nextMatchLabel)}</strong><small>${upcoming.length} match(s) à venir</small>
+    </article>
+    <article class="stat-card">
+      <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <span>Places choisies</span><strong>${participationCount}</strong><small>sur les matchs à venir</small>
+    </article>
+    <article class="stat-card ${cardPaid ? "" : "accent-card"}">
+      <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></span>
+      <span>Carte membre</span><strong>${cardPaid ? "Payée" : "Non payée"}</strong>
+      <small>${cardPaid && s.card_paid_at ? "Le " + new Date(s.card_paid_at).toLocaleDateString("fr-TN") : "À régler auprès de l’administration"}</small>
+    </article>
+    <article class="stat-card">
+      <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 105 9.5C5 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg></span>
+      <span>Zone</span><strong>${escapeHtml(s.zones?.name || "—")}</strong><small>${escapeHtml(facultyShort(s.faculties?.name) || "Faculté non renseignée")}</small>
+    </article>
+  `;
+}
+
 async function loadUpcomingMatches() {
   const container = $("#upcomingMatches");
   if (!container) return;
@@ -138,6 +178,12 @@ async function loadUpcomingMatches() {
   $("#welcomeName").textContent = `Bienvenue ${s.prenom || ""} ${s.nom || ""}`.trim();
   $("#userName").textContent = `${s.prenom || ""} ${s.nom || ""}`.trim();
   $("#avatar").textContent = (s.prenom || s.nom || "U").charAt(0).toUpperCase();
+  const heroAvatar = $("#heroAvatar");
+  if (heroAvatar) {
+    heroAvatar.innerHTML = s.photo_url
+      ? `<img src="${escapeHtml(s.photo_url)}" alt="Photo de profil" onerror="this.parentElement.textContent='${escapeHtml((s.prenom || s.nom || "U").charAt(0).toUpperCase())}';">`
+      : escapeHtml((s.prenom || s.nom || "U").charAt(0).toUpperCase());
+  }
   $("#statusBadge").outerHTML = `<span id="statusBadge" class="badge ${s.status === "ACTIVE" ? "active" : "inactive"}">${s.status === "ACTIVE" ? "Abonnement actif" : "Abonnement désactivé"}</span>`;
   $("#nom").value=s.nom||""; $("#prenom").value=s.prenom||""; $("#numero").value=s.numero_abonnement||"";
   $("#phone").value=s.phone||""; $("#email").value=s.email||""; $("#faculte").value=facultyShort(s.faculties?.name)||"";
@@ -156,7 +202,7 @@ async function loadUpcomingMatches() {
     document.body.classList.remove("print-card-mode");
     if (cardPanel) cardPanel.classList.remove("print-card-section");
   });
-  await loadUpcomingMatches();
+  await Promise.all([loadUpcomingMatches(), loadMemberStats(s)]);
 })();
 $("#profileForm").addEventListener("submit", async e=>{
   e.preventDefault();

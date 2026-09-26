@@ -2,35 +2,47 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>UE Clubiste — Mon espace</title><link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css">
+<title>UE Clubiste — Mon espace</title><link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css?v=20260926e">
 </head>
 <body data-page="subscriber">
 <div class="app">
   <aside class="sidebar">
     <div class="side-brand"><img src="assets/logo.png"><div><b>UE Clubiste</b><small>Espace Abonné</small></div></div>
-    <nav><a class="active" href="subscriber.html">⌂ <span>Mon profil</span></a><a href="matchs.html">⚽ <span>Matchs</span></a><a href="#security">⌁ <span>Sécurité</span></a></nav>
-    <button id="logoutBtn" class="side-logout">↪ Déconnexion</button>
+    <nav>
+      <a class="active" href="subscriber.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.3 18.5c.9-2.5 3-3.8 5.7-3.8s4.8 1.3 5.7 3.8"/></svg> <span>Mon profil</span></a>
+      <a href="matchs.html"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8.2l3.4 2.5-1.3 4h-4.2l-1.3-4z"/><path d="M12 8.2V4.6M15.4 10.7l3.3-1.4M13.1 14.7l1.9 3.1M8.9 14.7L7 17.8M8.6 10.7L5.3 9.3"/></svg> <span>Matchs</span></a>
+      <a href="#security"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 118 0v3"/></svg> <span>Sécurité</span></a>
+    </nav>
+    <button id="logoutBtn" class="side-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4H18a2 2 0 012 2v12a2 2 0 01-2 2h-4.5"/><path d="M3 12h11.5"/><path d="M11 8l4 4-4 4"/></svg> Déconnexion</button>
   </aside>
   <div class="main">
     <header class="topbar"><button class="menu-btn" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div><span class="top-kicker">ESPACE ABONNÉ</span><h1>Mon espace</h1></div><div class="top-user"><div class="avatar" id="avatar">U</div><span id="userName">Utilisateur</span></div></header>
     <main class="content">
       <div id="pageAlert"></div>
-      <section class="hero-card">
-        <div><span class="mini-label">MON ABONNEMENT</span><h2 id="welcomeName">Bienvenue</h2><p>Retrouvez ici vos informations personnelles et l’état de votre abonnement.</p></div>
-        <div style="display:flex; flex-direction:column; gap:12px; align-items:flex-end;">
+      <section class="hero-card member-hero">
+        <div class="member-hero-identity">
+          <div class="member-hero-avatar" id="heroAvatar">U</div>
+          <div><span class="mini-label">MON ABONNEMENT</span><h2 id="welcomeName">Bienvenue</h2><p>Retrouvez ici vos informations personnelles et l’état de votre abonnement.</p></div>
+        </div>
+        <div class="member-hero-actions">
           <span id="statusBadge" class="badge">—</span>
           <a class="btn secondary" href="https://staduim.ueclubistes.tn" target="_blank" rel="noopener noreferrer">Live du stade</a>
         </div>
       </section>
 
+      <section class="stats-grid" id="memberStats"></section>
+
       <section id="profil" class="panel">
         <div class="panel-head"><div><span class="mini-label">PROFIL</span><h2>Informations personnelles</h2></div><button id="editBtn" class="btn secondary">Modifier</button></div>
         <form id="profileForm" class="grid-form">
           <label>Nom<input id="nom" disabled></label><label>Prénom<input id="prenom" disabled></label>
-          <label>N° abonnement<input id="numero" disabled></label><label>Téléphone<input id="phone"></label>
-          <label>Email<input id="email" type="email"></label><label>Faculté<input id="faculte" disabled></label>
-          <label>Adresse<input id="adresse"></label><label>Zone<input id="zone" disabled></label>
-          <label>CIN<input id="cin" disabled></label><label>Sexe<input id="gender" disabled></label>
+          <label>N° abonnement<input id="numero" disabled></label><label>CIN<input id="cin" disabled></label>
+          <label>Sexe<input id="gender" disabled></label><label>Faculté<input id="faculte" disabled></label>
+          <label>Zone<input id="zone" disabled></label>
+          <p class="muted-text full-field profile-section-label">Coordonnées — modifiables</p>
+          <label>Téléphone<input id="phone"></label>
+          <label>Email<input id="email" type="email"></label>
+          <label class="full-field">Adresse<input id="adresse"></label>
           <div id="saveRow" class="form-actions hidden"><button type="button" id="cancelBtn" class="btn secondary">Annuler</button><button class="btn primary" type="submit">Enregistrer</button></div>
         </form>
       </section>
@@ -64,5 +76,5 @@
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="js/config.js"></script><script src="js/common.js"></script><script src="js/subscriber.js"></script>
+<script src="js/config.js?v=20260926e"></script><script src="js/common.js?v=20260926e"></script><script src="js/subscriber.js?v=20260926e"></script>
 </body></html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UE Clubiste — Paiements</title>
-<link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css?v=20260926e">
 </head>
 <body data-page="admin">
 <div class="app">
@@ -24,27 +24,34 @@
 <header class="topbar"><button class="menu-btn" id="menuBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div><span class="top-kicker">ADMINISTRATION</span><h1>Paiements</h1></div><div class="top-user"><div class="avatar">A</div><span>Admin</span></div></header>
 <main class="content">
 <div id="pageAlert"></div>
+<section class="stats-grid" id="globalStats"></section>
 <section class="panel">
-  <div class="panel-head"><div><span class="mini-label">ÉVÉNEMENTS</span><h2>Gestion des collectes</h2></div><button id="addEventBtn" class="btn primary">+ Ajouter un événement</button></div>
+  <div class="panel-head"><div><span class="mini-label">ÉVÉNEMENTS</span><h2>Gestion des cotisations</h2></div><button id="addEventBtn" class="btn primary">+ Ajouter une cotisation</button></div>
   <div id="eventsGrid" class="events-grid"></div>
 </section>
 </main></div></div>
 
-<div id="eventFormModal" class="modal hidden"><div class="modal-box small"><div class="modal-head"><div><span class="mini-label">ÉVÉNEMENT</span><h2 id="eventFormTitle">Ajouter un événement</h2></div><button class="close" id="closeEventFormModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div id="eventFormModal" class="modal hidden"><div class="modal-box small"><div class="modal-head"><div><span class="mini-label">COTISATION</span><h2 id="eventFormTitle">Ajouter une cotisation</h2></div><button class="close" id="closeEventFormModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <form id="eventForm" class="form-stack"><input type="hidden" id="eventId">
 <label>Nom *<input id="eventName" required placeholder="Ex : Sortie annuelle"></label>
 <label>Description<textarea id="eventDescription" rows="2" placeholder="Informations complémentaires"></textarea></label>
 <label>Date<input id="eventDate" type="date"></label>
 <label>Montant par abonné (DT) *<input id="eventAmount" type="number" min="0" step="0.1" required placeholder="Ex : 20"></label>
-<label>Événement actif<select id="eventActive"><option value="true">Oui</option><option value="false">Non</option></select></label>
-<div class="form-actions"><button type="button" class="btn secondary" id="cancelEventForm">Annuler</button><button class="btn primary">Enregistrer</button></div>
+<label>Cotisation active<select id="eventActive"><option value="true">Oui</option><option value="false">Non</option></select></label>
+<div class="form-actions"><button type="button" class="btn secondary" id="cancelEventForm">Annuler</button><button class="btn primary" type="submit" id="eventFormSubmitBtn">Créer la cotisation</button></div>
 </form></div></div>
 
-<div id="eventPayModal" class="modal hidden"><div class="modal-box pay-modal"><div class="modal-head"><div><span class="mini-label">COLLECTE</span><h2 id="payEventTitle">Événement</h2><p id="payEventMeta" class="modal-subtitle"></p></div><button class="close" id="closePayModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div id="eventPayModal" class="modal hidden"><div class="modal-box pay-modal"><div class="modal-head"><div><span class="mini-label">COTISATION</span><h2 id="payEventTitle">Événement</h2><p id="payEventMeta" class="modal-subtitle"></p></div><button class="close" id="closePayModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <div class="stats-grid pay-stats" id="payStats"></div>
-<div class="toolbar"><input id="paySearch" class="search" placeholder="Rechercher un abonné..."><select id="payFilter"><option value="">Tous</option><option value="paid">Payé</option><option value="unpaid">Non payé</option></select></div>
-<div class="table-wrap"><table><thead><tr><th>Nom</th><th>Prénom</th><th>N° Abonnement</th><th>Faculté</th><th>Statut</th><th>Action</th></tr></thead><tbody id="payRows"></tbody></table></div>
+<div class="toolbar pay-toolbar">
+  <input id="paySearch" class="search" placeholder="Rechercher un abonné...">
+  <select id="payFilter"><option value="">Tous</option><option value="paid">Payé</option><option value="unpaid">Non payé</option></select>
+  <button type="button" id="markAllPaidBtn" class="btn secondary">Tout marquer payé</button>
+  <button type="button" id="markAllUnpaidBtn" class="btn secondary">Tout marquer non payé</button>
+  <button type="button" id="copyUnpaidBtn" class="btn secondary">Copier les numéros des impayés</button>
+</div>
+<div class="table-wrap"><table><thead><tr><th>Nom</th><th>Prénom</th><th>Téléphone</th><th>Faculté</th><th>Statut</th><th>Payé le</th><th>Action</th></tr></thead><tbody id="payRows"></tbody></table></div>
 </div></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="js/config.js"></script><script src="js/common.js"></script><script src="js/admin-payments.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="js/config.js?v=20260926e"></script><script src="js/common.js?v=20260926e"></script><script src="js/admin-payments.js?v=20260926e"></script>
 </body></html>

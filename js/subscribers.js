@@ -200,6 +200,20 @@ window.showMemberCard = id => {
   openMemberCard(s);
 };
 
+function setPhotoPreview(url) {
+  const img = $("#fPhotoPreview");
+  const empty = $("#fPhotoPreviewEmpty");
+  if (url) {
+    img.src = url;
+    img.classList.remove("hidden");
+    empty.classList.add("hidden");
+  } else {
+    img.removeAttribute("src");
+    img.classList.add("hidden");
+    empty.classList.remove("hidden");
+  }
+}
+
 function openModal(s = null) {
   $("#modal").classList.remove("hidden");
   $("#modalTitle").textContent = s ? "Modifier un abonné" : "Ajouter un abonné";
@@ -222,10 +236,43 @@ function openModal(s = null) {
     if (el) el.value = value;
   });
 
+  $("#fPhotoFile").value = "";
+  setPhotoPreview(s?.photo_url || "");
+
   $("#fGender").value = s?.gender || "";
   selectFaculty(s?.faculty_id || "", s?.faculties?.name || "");
   $("#fZone").value = s?.zone_id || "";
   $("#fStatus").value = s?.status || "ACTIVE";
+}
+
+$("#fPhotoFile").addEventListener("change", () => {
+  const file = $("#fPhotoFile").files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => setPhotoPreview(reader.result);
+  reader.readAsDataURL(file);
+});
+
+async function uploadSubscriberPhoto(file) {
+  if (!file) return null;
+
+  const ext = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
+  const fileName = `subscriber-photos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { error } = await sb.storage.from("subscriber-photos").upload(fileName, file, {
+    cacheControl: "3600",
+    upsert: true
+  });
+
+  if (error) {
+    if (/bucket.*not found|not found/i.test(error.message || "")) {
+      throw new Error("Le bucket 'subscriber-photos' n'est pas accessible. Exécutez supabase/subscriber_photos.sql et vérifiez qu'il est public.");
+    }
+    throw new Error(`Erreur upload de la photo: ${error.message}`);
+  }
+
+  const { data } = sb.storage.from("subscriber-photos").getPublicUrl(fileName);
+  return data?.publicUrl || null;
 }
 
 window.editSub = id => openModal(allSubs.find(s => s.id === id));
@@ -270,23 +317,10 @@ window.resetPassword = async userId => {
   if (password.length < 12) return showAlert("#pageAlert", "Le mot de passe doit contenir au moins 12 caractères.", "error");
   if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) return showAlert("#pageAlert", "Utilisez une majuscule, une minuscule, un chiffre et un caractère spécial.", "error");
 
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return showAlert("#pageAlert", "Session administrateur expirée.", "error");
-
-  const response = await fetch(`${UE_CONFIG.SUPABASE_URL}/functions/v1/admin-reset-password`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${session.access_token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ user_id: userId, new_password: password })
-  });
-
-  let result = {};
-  try { result = await response.json(); } catch (_) {}
-
-  if (!response.ok) {
-    return showAlert("#pageAlert", result.error || "Réinitialisation impossible.", "error");
+  try {
+    await callEdgeFunction("admin-reset-password", { user_id: userId, new_password: password });
+  } catch (error) {
+    return showAlert("#pageAlert", error.message, "error");
   }
 
   showAlert("#pageAlert", "Mot de passe réinitialisé. Le changement sera demandé à la prochaine connexion.");
@@ -295,22 +329,13 @@ window.resetPassword = async userId => {
 window.deleteSub = async id => {
   if (!(await confirmDialog("Supprimer cet abonné et son compte ? Cette action est irréversible.", { confirmText: "Supprimer" }))) return;
 
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return showAlert("#pageAlert", "Session administrateur expirée.", "error");
+  try {
+    await callEdgeFunction("admin-delete-user", { subscriber_id: id });
+  } catch (error) {
+    return showAlert("#pageAlert", error.message, "error");
+  }
 
-  const response = await fetch(`${UE_CONFIG.SUPABASE_URL}/functions/v1/admin-delete-user`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${session.access_token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ subscriber_id: id })
-  });
-
-  let result = {};
-  try { result = await response.json(); } catch (_) {}
-
-  if (!response.ok) return showAlert("#pageAlert", result.error || "Suppression impossible.", "error");
+  showAlert("#pageAlert", "Abonné supprimé.");
   await loadSubs();
 };
 
@@ -353,6 +378,16 @@ $("#subscriberForm").addEventListener("submit", async e => {
     return showAlert("#pageAlert", "Veuillez sélectionner le sexe : Homme ou Femme.", "error");
   }
 
+  let photoUrl = $("#fPhotoUrl").value.trim() || null;
+  const photoFile = $("#fPhotoFile").files[0];
+  if (photoFile) {
+    try {
+      photoUrl = await uploadSubscriberPhoto(photoFile);
+    } catch (error) {
+      return showAlert("#pageAlert", error.message, "error");
+    }
+  }
+
   const payload = {
     nom: $("#fNom").value.trim(),
     prenom: $("#fPrenom").value.trim(),
@@ -362,7 +397,7 @@ $("#subscriberForm").addEventListener("submit", async e => {
     gender,
     phone: $("#fPhone").value.trim(),
     email: $("#fEmail").value.trim(),
-    photo_url: $("#fPhotoUrl").value.trim() || null,
+    photo_url: photoUrl,
     adresse: $("#fAdresse").value.trim(),
     faculty_id: $("#fFaculte").value || null,
     zone_id: $("#fZone").value || null,
@@ -378,22 +413,11 @@ $("#subscriberForm").addEventListener("submit", async e => {
     if (error) return showAlert("#pageAlert", error.message, "error");
     showAlert("#pageAlert", "Abonné modifié avec succès.");
   } else {
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) return showAlert("#pageAlert", "Session administrateur expirée.", "error");
-
-    const response = await fetch(`${UE_CONFIG.SUPABASE_URL}/functions/v1/admin-create-user`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    let result = {};
-    try { result = await response.json(); } catch (_) {}
-
-    if (!response.ok) return showAlert("#pageAlert", result.error || "Création impossible.", "error");
+    try {
+      await callEdgeFunction("admin-create-user", payload);
+    } catch (error) {
+      return showAlert("#pageAlert", error.message, "error");
+    }
     showAlert("#pageAlert", "Abonné créé avec succès.");
   }
 

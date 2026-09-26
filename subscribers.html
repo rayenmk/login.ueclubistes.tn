@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>UE Clubiste — Abonnés</title>
-<link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="assets/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="css/style.css?v=20260926e">
 </head>
 <body data-page="admin">
 <div class="app">
@@ -39,7 +39,14 @@
 <label>CIN<input id="fCin" required></label>
 <label>Sexe *<select id="fGender" required><option value="">Choisir le sexe</option><option value="MALE">Homme</option><option value="FEMALE">Femme</option></select></label>
 <label>Téléphone<input id="fPhone"></label><label>Email<input id="fEmail" type="email"></label>
-<label>Photo URL<input id="fPhotoUrl" type="url" placeholder="https://.../photo.jpg"></label><label>Adresse<input id="fAdresse"></label>
+<label class="full-field photo-field">Photo
+  <span class="photo-upload-row">
+    <span class="photo-preview-wrap"><img id="fPhotoPreview" class="photo-preview hidden"><span id="fPhotoPreviewEmpty" class="photo-preview-empty">Aucune photo</span></span>
+    <input id="fPhotoFile" type="file" accept="image/*">
+    <input type="hidden" id="fPhotoUrl">
+  </span>
+</label>
+<label>Adresse<input id="fAdresse"></label>
 <label class="combo-field">Faculté<div class="combo"><input id="fFaculteSearch" type="text" autocomplete="off" placeholder="Tapez ISET, FSEG, ISG, une ville..."><input type="hidden" id="fFaculte"><div id="fFaculteList" class="combo-list hidden"></div></div></label>
 <label>Zone<select id="fZone"></select></label>
 <label>Statut<select id="fStatus"><option value="ACTIVE">Actif</option><option value="INACTIVE">Désactivé</option></select></label>
@@ -47,5 +54,5 @@
 </form><p class="hint">À la création, le mot de passe initial est le CIN. Il doit être changé à la première connexion. Le sexe est obligatoire pour appliquer les règles de placement des matchs.</p></div></div>
 
 <div id="memberCardModal" class="modal hidden"><div class="modal-box member-card-modal"><div class="modal-head"><div><span class="mini-label">CARTE MEMBRE</span><h2>Carte de l’abonné</h2></div><button class="close" id="closeMemberCardModal">×</button></div><div id="memberCardContent"></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="js/config.js"></script><script src="js/common.js"></script><script src="js/subscribers.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script src="js/config.js?v=20260926e"></script><script src="js/common.js?v=20260926e"></script><script src="js/subscribers.js?v=20260926e"></script>
 </body></html>

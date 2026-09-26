@@ -3,6 +3,7 @@ let filteredMatches = [];
 let subscriber = null;
 let currentMatch = null;
 let selectedZoneId = null;
+let selectedSport = "";
 let myParticipation = new Map();
 
 const zoneLabels = {
@@ -29,6 +30,13 @@ function formatMatchDate(date, time) {
 
 function formatTime(time) {
   return time ? String(time).slice(0, 5) : "Heure à confirmer";
+}
+
+function isMatchUpcoming(match) {
+  if (!match || !match.match_date) return false;
+  const now = new Date();
+  const matchDate = new Date(`${match.match_date}T${match.match_time || "23:59:00"}`);
+  return matchDate > now;
 }
 
 async function loadSubscriber() {
@@ -72,12 +80,31 @@ async function loadMatches() {
   matches = matchesResult.data || [];
   myParticipation = new Map((participationResult.data || []).map(p => [p.match_id, p]));
   applyFilter();
+  renderMatchPageStats();
 }
 
 function applyFilter() {
-  const sport = $("#sportFilter").value;
-  filteredMatches = matches.filter(m => !sport || m.sport === sport);
+  filteredMatches = matches.filter(m => !selectedSport || m.sport === selectedSport);
   renderMatches();
+}
+
+function renderMatchPageStats() {
+  const container = $("#matchPageStats");
+  if (!container) return;
+
+  const upcoming = matches.filter(isMatchUpcoming);
+  const chosen = matches.filter(m => myParticipation.has(m.id)).length;
+
+  container.innerHTML = `
+    <article class="stat-card">
+      <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+      <span>Matchs à venir</span><strong>${upcoming.length}</strong><small>tous sports confondus</small>
+    </article>
+    <article class="stat-card">
+      <span class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <span>Places choisies</span><strong>${chosen}</strong><small>sur ${matches.length} match(s) au total</small>
+    </article>
+  `;
 }
 
 function renderMatches() {
@@ -249,7 +276,13 @@ async function init() {
   if (!(await loadSubscriber())) return;
   await loadMatches();
 
-  $("#sportFilter").onchange = applyFilter;
+  $$(".sport-pill-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedSport = btn.dataset.sport;
+      $$(".sport-pill-btn").forEach(b => b.classList.toggle("active", b === btn));
+      applyFilter();
+    });
+  });
   $("#closeMatchModal").onclick = () => $("#matchModal").classList.add("hidden");
   $("#confirmZoneBtn").onclick = saveChoice;
   $("#notParticipateBtn").onclick = removeChoice;

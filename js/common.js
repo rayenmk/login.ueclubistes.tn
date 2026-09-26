@@ -123,6 +123,41 @@ function getTeamLogo(teamName, fallbackLabel, customUrl) {
 function statusBadge(status) {
   return `<span class="badge ${status === "ACTIVE" ? "active" : "inactive"}">${status === "ACTIVE" ? "Actif" : "Désactivé"}</span>`;
 }
+
+/* ============================================================
+   UE CLUBISTE — EDGE FUNCTION CALLS
+   Every privileged admin action (create/update/delete user or
+   admin, reset password) goes through here so a network/CORS
+   failure always surfaces a clear popup instead of failing silently.
+   ============================================================ */
+async function callEdgeFunction(name, body) {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) throw new Error("Session administrateur expirée.");
+
+  let response;
+  try {
+    response = await fetch(`${UE_CONFIG.SUPABASE_URL}/functions/v1/${name}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        apikey: UE_CONFIG.SUPABASE_ANON_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+  } catch (networkError) {
+    throw new Error(`Impossible de contacter le serveur (fonction "${name}"). Elle n'est peut-être pas déployée, ou votre connexion a été interrompue.`);
+  }
+
+  let result = {};
+  try { result = await response.json(); } catch (_) {}
+
+  if (!response.ok) {
+    throw new Error(result.error || `Erreur serveur (${response.status}).`);
+  }
+
+  return result;
+}
 async function getCurrentContext() {
   if (!window.sb) return null;
   const { data: { user }, error } = await sb.auth.getUser();
